@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from messhap.db import fake_users_db as fake_users_db
-from messhap.models import TokenData, User, UserInDb
+from .db import fake_users_db as fake_users_db
+from .models import Token, TokenData, User, UserInDb
 
 SECRET_KEY = '753050f81ac0298391264d2a7d1c30dcdf2782e432b81faf9e81309b50fedde8'
 ALGORITM = 'HS256'
@@ -54,7 +54,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, uname=token_data.username)
+    user = get_user(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -74,8 +74,19 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code= status.HTTP_400_BAD_REQUEST, detail="Inactive User")
     return current_user
 
-def fake_hash_password(password: str):
-    return "fakehashed" + password
+router = APIRouter(prefix="/token", tags= ["Authentication"])
 
-router = APIRouter(prefix="/login", tags= ["Authentication"])
+@router.post("", response_model=Token)
+async def login_for_access_token(form_data: oauth2_form = Depends()):
+    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code= status.HTTP_401_UNAUTHORIZED,
+            details = "Incorrect username or password",
+            headers= {"WWW-Authenticate": "Bearer"}
+        )
+    access_token_expires = timedelta(minutes= ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta= access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
 

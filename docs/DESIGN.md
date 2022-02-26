@@ -5,7 +5,7 @@
 
 Who| Goals   |Method |path   |body   | returns
 ----| ----    |---    |----   |----   | ----
-consumer | login | POST | /login | user credentials | token
+consumer | get access token | POST | /token | user credentials | token
 consumer | sign-in user to the list | POST | /users| user credentials | user info
 user | Update profile | UPDATE | /users/me | profile details | user profile
 user | Get user list | GET | users/ | - | List of user profiles
