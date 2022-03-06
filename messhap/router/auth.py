@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from .db import fake_users_db as fake_users_db
-from .models import Token, TokenData, User, UserInDb
+from ..db import fake_users_db as fake_users_db
+from ..models import Token, TokenData, User, UserInDb
 
 SECRET_KEY = "753050f81ac0298391264d2a7d1c30dcdf2782e432b81faf9e81309b50fedde8"
 ALGORITM = "HS256"
