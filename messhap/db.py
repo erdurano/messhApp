@@ -1,4 +1,4 @@
-from .models import User, UserInDb
+from .models import User, UserInDb, UserUpdate
 
 fake_users_db = {
     "johndoe": {
@@ -35,6 +35,13 @@ def is_user_exists(username: str):
 
 def sign_user_in_db(newuser: UserInDb):
     fake_users_db.update({newuser.username: newuser.dict()})
+
+
+def update_user_in_db(current_user: User, update_model: UserUpdate):
+    fake_users_db[current_user.username].update(
+        update_model.dict(exclude_unset=True)
+        )
+    return fake_users_db[current_user.username]
 
 
 def get_user_except_caller(caller: User):
