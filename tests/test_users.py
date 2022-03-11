@@ -7,7 +7,7 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def get_token():
+def get_token_header():
     client = TestClient(app)
     credentials = {"username": "johndoe", "password": "secret"}
     response: Response = client.post(
@@ -15,18 +15,20 @@ def get_token():
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         data=credentials,
     )
-    return response.json()["access_token"]
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 
 class TestGetMe:
-    def test_get_without_token(self):
+    @pytest.mark.usefixtures("client")
+    def test_get_without_token(self, client):
         response = client.get("/users/me")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Not authenticated"
 
-    def test_get_with_token(self, get_token):
-        token_header = {"Authorization": f"Bearer {get_token}"}
-        response = client.get("/users/me", headers=token_header)
+    @pytest.mark.usefixtures("client", "get_token_header")
+    def test_get_with_token(self, get_token_header):
+        response = client.get("/users/me", headers=get_token_header)
         assert response.status_code == status.HTTP_200_OK
 
 
@@ -45,15 +47,16 @@ class TestPatchMe:
         "disabled": False,
     }
 
-    def test_patch_without_token(self):
+    @pytest.mark.usefixtures("client")
+    def test_patch_without_token(self, client):
         response = client.patch("/users/me", json=self.good_patch)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Not authenticated"
 
-    def test_patch_with_token(self, get_token):
-        token_header = {"Authorization": f"Bearer {get_token}"}
+    @pytest.mark.usefixtures("client", "get_token_header")
+    def test_patch_with_token(self, client, get_token_header):
         response = client.patch(
-            "/users/me", headers=token_header, json=self.good_patch
+            "/users/me", headers=get_token_header, json=self.good_patch
             )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
@@ -63,10 +66,10 @@ class TestPatchMe:
             "full_name": "J. Doe",
         }
 
-    def test_patch_with_bad_json(self, get_token):
-        token_header = {"Authorization": f"Bearer {get_token}"}
+    @pytest.mark.usefixtures("client", "get_token_header")
+    def test_patch_with_bad_json(self, client, get_token_header):
         response = client.patch(
-            "/users/me", headers=token_header, json=self.bad_patch
+            "/users/me", headers=get_token_header, json=self.bad_patch
             )
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -96,7 +99,8 @@ class TestPost:
         "full_name": "Denis U. Heartman",
     }
 
-    def test_bad_credentials(self):
+    @pytest.mark.usefixtures("client")
+    def test_bad_credentials(self, client):
         response = client.post("/users", json=self.bad_guy)
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         assert response.json() == {
@@ -114,7 +118,8 @@ class TestPost:
             ]
         }
 
-    def test_good_credentials(self):
+    @pytest.mark.usefixtures("client")
+    def test_good_credentials(self, client):
         response = client.post("/users", json=self.good_guy)
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
