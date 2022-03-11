@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, root_validator, validator
+from enum import Enum
 
 
 class User(BaseModel):
@@ -79,3 +80,20 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class FriendshipStatus(Enum):
+    NOT_FRIEND = 0
+    REQUESTED = 1
+    FRIEND = 2
+    BLOCKED = -1
+
+
+class Friendship(BaseModel):
+    requester: str
+    requestee: str
+    status: FriendshipStatus
+
+
+class Friend(User):
+    status: FriendshipStatus

@@ -5,13 +5,13 @@ import pytest
 class TestGet:
 
     @pytest.mark.usefixtures("client")
-    def test_without_token(client):
+    def test_without_token(self, client):
 
         response = client.get("/friends")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.usefixtures("client", "get_token_header")
-    def test_with_token(get_token_header, client):
+    def test_with_token(self, get_token_header, client):
         response = client.get("/friends", headers=get_token_header)
         # Empty dict since there is no firends yet
         assert response.status_code == status.HTTP_200_OK
@@ -21,17 +21,17 @@ class TestGet:
 class TestPost:
 
     @pytest.mark.usefixtures("client")
-    def test_without_token(client):
+    def test_without_token(self, client):
         response = client.post("/friends/erdurano")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.usefixtures("client", "get_token_header")
-    def test_with_token(client, get_token_header):
+    def test_with_token(self, client, get_token_header):
         response = client.post("/friends", headers=get_token_header)
         assert response.status_code == status.HTTP_201_CREATED
 
     @pytest.mark.usefixtures("client", "get_token_header")
-    def test_with_multiple_request(client, get_token_header):
+    def test_with_multiple_request(self, client, get_token_header):
         response1 = client.post("/friends", headers=get_token_header)
         assert response1.status_code == status.HTTP_201_CREATED
         response2 = client.post("/friends", headers=get_token_header)
@@ -45,7 +45,7 @@ class TestPost:
 class TestUpdate:
 
     @pytest.mark.usefixtures("client")
-    def test_without_token(client):
+    def test_without_token(self, client):
         response = client.update(
             "/friends/erdurano",
             json={"status": "friend"}
@@ -55,7 +55,7 @@ class TestUpdate:
     @pytest.mark.usefixtures("client",
                              "get_token_header",
                              "get_2nd_token_header")
-    def test_with_token(client, get_token_header, get_2nd_token_header):
+    def test_with_token(self, client, get_token_header, get_2nd_token_header):
         response = client.update(
             "/friends/erdurano",
             headers=get_token_header,

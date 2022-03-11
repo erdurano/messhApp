@@ -10,7 +10,7 @@ def client():
     return client
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def get_token_header():
     client = TestClient(app)
     credentials = {"username": "johndoe", "password": "secret"}
@@ -23,7 +23,7 @@ def get_token_header():
     return {"Authorization": f"Bearer {token}"}
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def get_2nd_token_header():
     client = TestClient(app)
     credentials = {"username": "erdurano", "password": "123456"}

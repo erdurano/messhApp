@@ -1,4 +1,5 @@
-from .models import User, UserInDb, UserUpdate
+from typing import List
+from .models import Friend, FriendshipStatus, User, UserInDb, UserUpdate
 
 fake_users_db = {
     "johndoe": {
@@ -16,6 +17,9 @@ fake_users_db = {
         "disabled": False,
     },
 }
+
+fake_friends_db = [
+]
 
 
 class UserNotInDatabaseException(Exception):
@@ -40,7 +44,7 @@ def sign_user_in_db(newuser: UserInDb):
 def update_user_in_db(current_user: User, update_model: UserUpdate):
     fake_users_db[current_user.username].update(
         update_model.dict(exclude_unset=True)
-        )
+    )
     return fake_users_db[current_user.username]
 
 
@@ -51,3 +55,22 @@ def get_user_except_caller(caller: User):
         if username != caller_username:
             response.append(User(**profile))
     return response
+
+
+def get_friends_list_from_db(caller: User) -> List[Friend]:
+    friend_status = []
+
+    for friendship in fake_friends_db:
+        if friendship["status"] is not FriendshipStatus.BLOCKED:
+            status = friendship["status"]
+            friend_uname = (
+                friendship["requester"]
+                if friendship["requester"] != caller.username
+                else friendship["requestee"]
+                )
+            friend_dict = fake_users_db[friend_uname]
+            friend = Friend(status=status, **friend_dict)
+
+            friend_status.append(friend)
+
+    return friend_status
