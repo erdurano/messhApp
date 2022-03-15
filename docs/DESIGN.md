@@ -12,7 +12,7 @@ user | Update profile | PATCH | /users/me | profile details | user profile
 user | Get user list | GET | users/ | - | List of user profiles
 user | Get user list | GET | users/{uname} | - | user profile (public)
 user | Get friend list | GET | /friends | - | friend profile list
-user | Get friend list | GET | /friends/{uname} | - | friend profile
+user | Get friend| GET | /friends/{uname} | - | friend profile
 user | Post friend req | POST | /friends/{uname}| - | friend profile
 user | Update Friendship status | UPDATE | /friends/{uname}| - | friend profile
 user | Get chat ist | GET | /chats | - | list of users who chatted before|

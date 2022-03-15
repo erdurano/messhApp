@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr, root_validator, validator
 from enum import Enum
 
@@ -83,16 +84,17 @@ class TokenData(BaseModel):
 
 
 class FriendshipStatus(Enum):
-    NOT_FRIEND = 0
-    REQUESTED = 1
-    FRIEND = 2
-    BLOCKED = -1
+    NOT_FRIEND = "NF"
+    REQUESTED = "R"
+    FRIEND = "F"
+    BLOCKED = "B"
 
 
 class Friendship(BaseModel):
     requester: str
     requestee: str
     status: FriendshipStatus
+    blocker: Optional[str] = None
 
 
 class Friend(User):

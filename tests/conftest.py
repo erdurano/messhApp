@@ -2,10 +2,12 @@ import pytest
 from messhap import app
 from fastapi.testclient import TestClient
 from fastapi import Response
+from messhap.db import fake_friends_db
+from messhap.models import FriendshipStatus
 
 
 @pytest.fixture(scope="module")
-def client():
+def client() -> TestClient:
     client = TestClient(app)
     return client
 
@@ -34,3 +36,15 @@ def get_2nd_token_header():
     )
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def johndoe_requested():
+    fake_friends_db.append(
+        {
+            'requester': "johndoe",
+            "requestee": "erdurano",
+            "status": FriendshipStatus.REQUESTED,
+            "blocker": None,
+        }
+    )
