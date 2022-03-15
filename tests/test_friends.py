@@ -16,6 +16,41 @@ class TestGet:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
+    @pytest.mark.usefixtures("client", "get_token_header", "third_one_blocked")
+    def test_blocker_not_in_list(self, client, get_token_header):
+        response = client.get("/friends", headers=get_token_header)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [
+            {
+                "username": "erdurano",
+                "full_name": "Oğuzcan Erduran",
+                "email": "erdurano@gmail.com",
+                "disabled": False,
+                "status": "R"
+            },
+        ]
+
+    @pytest.mark.usefixtures("client", "get_token_header", "user_blocked")
+    def test_blocked_in_list(self, client, get_token_header):
+        response = client.get("/friends", headers=get_token_header)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [
+            {
+                "username": "erdurano",
+                "full_name": "Oğuzcan Erduran",
+                "email": "erdurano@gmail.com",
+                "disabled": False,
+                "status": "R"
+            },
+            {
+                "username": "sum_one",
+                "email": "sum.one@sumthing.com",
+                "full_name": None,
+                "disabled": False,
+                "status": "B"
+            }
+        ]
+
 
 class TestGetUname:
     @pytest.mark.usefixtures("client")

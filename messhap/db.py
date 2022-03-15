@@ -28,6 +28,10 @@ class UserNotInDatabaseException(Exception):
 
 
 class FriendshipNotInDatabaseException(Exception):
+    pass
+
+
+class FriendNotFoundException(Exception):
     message = "You are not yet interacted with user"
 
 
@@ -116,5 +120,5 @@ def get_friend_from_db(requester: str, requestee: str) -> Friend:
             **get_user_from_db(requestee)
         )
         return friend
-    except FriendshipNotInDatabaseException as e:
-        raise e
+    except FriendshipNotInDatabaseException:
+        raise FriendNotFoundException

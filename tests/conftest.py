@@ -2,8 +2,9 @@ import pytest
 from messhap import app
 from fastapi.testclient import TestClient
 from fastapi import Response
-from messhap.db import fake_friends_db
-from messhap.models import FriendshipStatus
+from messhap.db import fake_friends_db, fake_users_db
+from messhap.models import FriendshipStatus, UserInDb
+from messhap.router.auth import get_password_hash
 
 
 @pytest.fixture(scope="module")
@@ -47,4 +48,56 @@ def johndoe_requested():
             "status": FriendshipStatus.REQUESTED,
             "blocker": None,
         }
+    )
+
+
+@pytest.fixture
+def third_one_blocked():
+    fake_friends_db.extend(
+        [
+            {
+                'requester': "johndoe",
+                "requestee": "erdurano",
+                "status": FriendshipStatus.REQUESTED,
+                "blocker": None,
+            },
+            {
+                'requester': "johndoe",
+                "requestee": "sum_one",
+                "status": FriendshipStatus.BLOCKED,
+                "blocker": "sum_one",
+            }
+
+        ]
+    )
+
+
+@pytest.fixture
+def user_blocked():
+    fake_friends_db.extend(
+        [
+            {
+                'requester': "johndoe",
+                "requestee": "erdurano",
+                "status": FriendshipStatus.REQUESTED,
+                "blocker": None,
+            },
+            {
+                'requester': "johndoe",
+                "requestee": "sum_one",
+                "status": FriendshipStatus.BLOCKED,
+                "blocker": "johndoe",
+            }
+
+        ]
+    )
+
+    fake_users_db.update(
+        sum_one=UserInDb(
+            username="sum_one",
+            email="sum.one@sumthing.com",
+            full_name=None,
+            disabled=False,
+            hashed_password=get_password_hash("123456")
+        ).dict()
     )
