@@ -7,13 +7,13 @@ from messhap.models import FriendshipStatus, UserInDb
 from messhap.router.auth import get_password_hash
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def client() -> TestClient:
     client = TestClient(app)
     return client
 
 
-@pytest.fixture
+@pytest.fixture()
 def get_token_header():
     client = TestClient(app)
     credentials = {"username": "johndoe", "password": "secret"}
@@ -26,7 +26,7 @@ def get_token_header():
     return {"Authorization": f"Bearer {token}"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def get_2nd_token_header():
     client = TestClient(app)
     credentials = {"username": "erdurano", "password": "123456"}
@@ -39,7 +39,7 @@ def get_2nd_token_header():
     return {"Authorization": f"Bearer {token}"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def johndoe_requested():
     fake_friends_db.append(
         {
@@ -49,18 +49,13 @@ def johndoe_requested():
             "blocker": None,
         }
     )
+    return fake_friends_db
 
 
-@pytest.fixture
-def third_one_blocked():
+@pytest.fixture()
+def third_one_blocked(johndoe_requested):
     fake_friends_db.extend(
         [
-            {
-                'requester': "johndoe",
-                "requestee": "erdurano",
-                "status": FriendshipStatus.REQUESTED,
-                "blocker": None,
-            },
             {
                 'requester': "johndoe",
                 "requestee": "sum_one",
@@ -72,16 +67,10 @@ def third_one_blocked():
     )
 
 
-@pytest.fixture
-def user_blocked():
+@pytest.fixture(scope="function")
+def user_blocked(johndoe_requested):
     fake_friends_db.extend(
         [
-            {
-                'requester': "johndoe",
-                "requestee": "erdurano",
-                "status": FriendshipStatus.REQUESTED,
-                "blocker": None,
-            },
             {
                 'requester': "johndoe",
                 "requestee": "sum_one",

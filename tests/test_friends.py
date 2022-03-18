@@ -16,7 +16,9 @@ class TestGet:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
-    @pytest.mark.usefixtures("client", "get_token_header", "third_one_blocked")
+    @pytest.mark.usefixtures(
+        "client", "get_token_header", "johndoe_requested", "third_one_blocked"
+    )
     def test_blocker_not_in_list(self, client, get_token_header):
         response = client.get("/friends", headers=get_token_header)
         assert response.status_code == status.HTTP_200_OK
@@ -26,7 +28,7 @@ class TestGet:
                 "full_name": "Oğuzcan Erduran",
                 "email": "erdurano@gmail.com",
                 "disabled": False,
-                "status": "R"
+                "status": "R",
             },
         ]
 
@@ -40,15 +42,15 @@ class TestGet:
                 "full_name": "Oğuzcan Erduran",
                 "email": "erdurano@gmail.com",
                 "disabled": False,
-                "status": "R"
+                "status": "R",
             },
             {
                 "username": "sum_one",
                 "email": "sum.one@sumthing.com",
                 "full_name": None,
                 "disabled": False,
-                "status": "B"
-            }
+                "status": "B",
+            },
         ]
 
 
@@ -75,7 +77,7 @@ class TestPostUname:
         response = client.post("/friends/erdurano")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.usefixtures("client", "get_token_header")
+    @pytest.mark.usefixtures("client", "get_token_header", "johndoe_requested")
     def test_with_token(self, client, get_token_header):
         response = client.post("/friends/erdurano", headers=get_token_header)
         assert response.status_code == status.HTTP_201_CREATED
