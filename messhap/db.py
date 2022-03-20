@@ -47,7 +47,8 @@ def is_user_exists(username: str):
 
 
 def sign_user_in_db(newuser: UserInDb):
-    fake_users_db.update({newuser.username: newuser.dict()})
+    if not is_user_exists(newuser.username):
+        fake_users_db.update({newuser.username: newuser.dict()})
 
 
 def update_user_in_db(current_user: User, update_model: UserUpdate):

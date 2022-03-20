@@ -62,7 +62,7 @@ class TestGetUname:
 
     @pytest.mark.usefixtures("client", "get_token_header")
     def test_with_token(self, client, get_token_header):
-        response = client.get("/friends/erdurano", headers=get_token_header)
+        response = client.get("/friends/abs", headers=get_token_header)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @pytest.mark.usefixtures("client", "get_token_header", "johndoe_requested")
@@ -77,12 +77,12 @@ class TestPostUname:
         response = client.post("/friends/erdurano")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.usefixtures("client", "get_token_header", "johndoe_requested")
+    @pytest.mark.usefixtures("client", "get_token_header", "friends_db")
     def test_with_token(self, client, get_token_header):
         response = client.post("/friends/erdurano", headers=get_token_header)
         assert response.status_code == status.HTTP_201_CREATED
 
-    @pytest.mark.usefixtures("client", "get_token_header")
+    @pytest.mark.usefixtures("client", "get_token_header", "friends_db")
     def test_with_multiple_request(self, client, get_token_header):
         response1 = client.post("/friends/erdurano", headers=get_token_header)
         assert response1.status_code == status.HTTP_201_CREATED
@@ -92,12 +92,14 @@ class TestPostUname:
 
 
 class TestUpdate:
-    @pytest.mark.usefixtures("client")
+    @pytest.mark.usefixtures("client", "johndoe_requested")
     def test_without_token(self, client):
         response = client.update("/friends/erdurano", json={"status": "friend"})
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    @pytest.mark.usefixtures("client", "get_token_header", "get_2nd_token_header")
+    @pytest.mark.usefixtures(
+        "client", "get_token_header", "get_2nd_token_header", "johndoe_requested"
+    )
     def test_with_token(self, client, get_token_header, get_2nd_token_header):
         response = client.update(
             "/friends/erdurano", headers=get_token_header, json={"status": "friend"}
