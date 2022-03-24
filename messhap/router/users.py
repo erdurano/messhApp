@@ -12,7 +12,7 @@ from ..db import (
     sign_user_in_db,
     update_user_in_db,
 )
-from ..models import User, UserInDb, UserRegister, UserUpdate
+from ..schemas import User, UserInDb, UserRegister, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["User management"])
 

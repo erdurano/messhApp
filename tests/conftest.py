@@ -3,7 +3,7 @@ from messhap import app
 from fastapi.testclient import TestClient
 from fastapi import Response
 from messhap.db import fake_friends_db, fake_users_db
-from messhap.models import FriendshipStatus, UserInDb
+from messhap.schemas import FriendshipStatus, UserInDb
 from messhap.router.auth import get_password_hash
 
 

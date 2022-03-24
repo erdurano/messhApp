@@ -84,10 +84,10 @@ class TokenData(BaseModel):
 
 
 class FriendshipStatus(Enum):
-    NOT_FRIEND = "NF"
-    REQUESTED = "R"
-    FRIEND = "F"
-    BLOCKED = "B"
+    NOT_FRIEND = "not_friend"
+    REQUESTED = "requested"
+    FRIEND = "friend"
+    BLOCKED = "blocked"
 
 
 class Friendship(BaseModel):

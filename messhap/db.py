@@ -1,7 +1,7 @@
 from typing import List
 
-from .models import (Friend, Friendship, FriendshipStatus, User, UserInDb,
-                     UserUpdate)
+from .schemas import (Friend, Friendship, FriendshipStatus, User, UserInDb,
+                      UserUpdate)
 
 fake_users_db = {
     "johndoe": {
@@ -121,5 +121,14 @@ def get_friend_from_db(requester: str, requestee: str) -> Friend:
             **get_user_from_db(requestee)
         )
         return friend
-    except FriendshipNotInDatabaseException:
-        raise FriendNotFoundException
+    except FriendshipNotInDatabaseException as e:
+        raise FriendNotFoundException from e
+
+
+def update_friendship_in_db(
+        requester: str, requestee: str, status: FriendshipStatus
+        ) -> None:
+    fship = get_friendship(requester, requestee)
+    ind = fake_friends_db.index(fship.dict())
+    fship.status = status
+    fake_friends_db[ind] = fship.dict()

@@ -28,7 +28,7 @@ class TestGet:
                 "full_name": "Oğuzcan Erduran",
                 "email": "erdurano@gmail.com",
                 "disabled": False,
-                "status": "R",
+                "status": "requested",
             },
         ]
 
@@ -42,14 +42,14 @@ class TestGet:
                 "full_name": "Oğuzcan Erduran",
                 "email": "erdurano@gmail.com",
                 "disabled": False,
-                "status": "R",
+                "status": "requested",
             },
             {
                 "username": "sum_one",
                 "email": "sum.one@sumthing.com",
                 "full_name": None,
                 "disabled": False,
-                "status": "B",
+                "status": "blocked",
             },
         ]
 
@@ -94,21 +94,26 @@ class TestPostUname:
 class TestUpdate:
     @pytest.mark.usefixtures("client", "johndoe_requested")
     def test_without_token(self, client):
-        response = client.update("/friends/erdurano", json={"status": "friend"})
+        response = client.patch("/friends/erdurano", json={"status": "friend"})
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.usefixtures(
         "client", "get_token_header", "get_2nd_token_header", "johndoe_requested"
     )
     def test_with_token(self, client, get_token_header, get_2nd_token_header):
-        response = client.update(
-            "/friends/erdurano", headers=get_token_header, json={"status": "friend"}
-        )
-        assert response.status == status.HTTP_403_FORBIDDEN
-        assert response.json() == {
-            "message": "You can not accept user as friend since you requested"
+        friendship = {
+            "requester": "johndoe",
+            "requestee": "erdurano",
+            "status": "friend"
         }
-        response_to_other = client.update(
-            "/friends/johndoe", headers=get_2nd_token_header, json={"status": "friend"}
+        response = client.patch(
+            "/friends/erdurano", headers=get_token_header, json=friendship
         )
-        assert response_to_other.status == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.json() == {
+            "detail": "You can not accept user as friend since you requested"
+        }
+        response_to_other = client.patch(
+            "/friends/johndoe", headers=get_2nd_token_header, json=friendship
+        )
+        assert response_to_other.status_code == status.HTTP_200_OK
