@@ -9,6 +9,7 @@ jose = "*"
 jwt = "*"
 passlib = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
+sqlalchemy = "*"
 
 [dev-packages]
 pytest = "*"

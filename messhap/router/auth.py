@@ -5,10 +5,11 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from ..db import fake_users_db as fake_users_db
 from ..schemas import Token, TokenData, User, UserInDb
+from ..config import settings
 
-SECRET_KEY = "753050f81ac0298391264d2a7d1c30dcdf2782e432b81faf9e81309b50fedde8"
-ALGORITM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_mins
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 oauth2_form = OAuth2PasswordRequestForm
