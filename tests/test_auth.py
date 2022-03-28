@@ -1,10 +1,11 @@
+import pytest
+
 from fastapi import Response, status
 from fastapi.testclient import TestClient
 from messhap.main import app
 
-client = TestClient(app)
 
-
+@pytest.mark.usefixtures("user_db", "client")
 def test_token():
     client = TestClient(app)
     credentials = {"username": "johndoe", "password": "secret"}

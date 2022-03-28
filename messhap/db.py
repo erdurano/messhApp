@@ -35,11 +35,18 @@ class FriendNotFoundException(Exception):
     message = "You are not yet interacted with user"
 
 
+def get_user_auth(uname: str):
+    if uname not in fake_users_db.keys():
+        raise UserNotInDatabaseException
+    else:
+        return UserInDb(**fake_users_db[uname])
+
+
 def get_user_from_db(uname: str):
     if uname not in fake_users_db.keys():
         raise UserNotInDatabaseException
     else:
-        return fake_users_db[uname]
+        return User(**fake_users_db[uname])
 
 
 def is_user_exists(username: str):
@@ -118,7 +125,7 @@ def get_friend_from_db(requester: str, requestee: str) -> Friend:
         friendship = get_friendship(requester, requestee)
         friend = Friend(
             status=friendship.status,
-            **get_user_from_db(requestee)
+            **get_user_from_db(requestee).dict()
         )
         return friend
     except FriendshipNotInDatabaseException as e:

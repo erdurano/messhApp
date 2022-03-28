@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from ..db import fake_users_db as fake_users_db
-from ..schemas import Token, TokenData, User, UserInDb
+from ..db import get_user_from_db, get_user_auth
+from ..schemas import Token, TokenData, User
 from ..config import settings
 
 SECRET_KEY = settings.secret_key
@@ -17,12 +17,6 @@ oauth2_form = OAuth2PasswordRequestForm
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDb(**user_dict)
-
-
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -31,19 +25,14 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+def authenticate_user(username: str, password: str):
+    user = get_user_auth(username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    elif not verify_password(password, user.hashed_password):
         return False
-    return user
-
-
-# this would be replaced
-def fake_decode_token(token):
-    user = get_user(fake_users_db, token)
-    return user
+    else:
+        return user
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -60,7 +49,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user_from_db(uname=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -90,7 +79,7 @@ router = APIRouter(prefix="/token", tags=["Authentication"])
 
 @router.post("", response_model=Token)
 async def login_for_access_token(form_data: oauth2_form = Depends()):
-    user = authenticate_user(fake_users_db,
+    user = authenticate_user(
                              form_data.username,
                              form_data.password
                              )
