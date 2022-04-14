@@ -3,10 +3,10 @@
 
 ## Goals Canvas
 
-Who| Goals   |Method |path   |body   | returns
+Who| Goals   |Method |Path   |Body   | Returns
 ----| ----    |---    |----   |----   | ----
-consumer | get access token | POST | /token | user credentials | token
-consumer | sign-in user to the list | POST | /users| user credentials | user info
+consumer | Get access token | POST | /token | user credentials | token
+consumer | Create user| POST | /users| user credentials | user info
 user | Update profile | GET | /users/me | -  | user profile
 user | Update profile | PATCH | /users/me | profile details | user profile
 user | Get user list | GET | users/ | - | List of user profiles
